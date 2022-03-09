@@ -9,11 +9,13 @@ parameters:
 - name: variable_group
   displayName: Variable Group
   type: string
-  default: BuildAgents
+#   default: BuildAgents
+  default: azuredevops-buildagents
 - name: agent_pool
   displayName: Agent Pool
   type: string
-  default: CI Windows2019
+#   default: CI Windows2019
+  default: Linux
 
 trigger: none
 
@@ -140,33 +142,33 @@ jobs:
                         -OsVhdUri $(OSDiskUri) `
                         -OsType $(OsType)
 
-- job: updatevmss
-  displayName: Update Virtual Machine Scale Set (${{ parameters.image_type }})
-  timeoutInMinutes: 600
-  cancelTimeoutInMinutes: 30
-  pool: 
-    name: ${{ parameters.agent_pool }}
-  dependsOn: managedimagegeneration
-  variables:
-  - name: ManagedImageId
-    value: $[ dependencies.managedimagegeneration.outputs['createmanagedimage.ManagedImageId'] ]
-  - ${{ if eq(parameters.image_type, 'windows2019') }}:
-    - name: VmssName
-      value: $[variables.VMSS_Windows2019]
-  - ${{ if eq(parameters.image_type, 'ubuntu2004') }}:
-    - name: VmssName
-      value: $[variables.VMSS_Ubuntu2004]
+# - job: updatevmss
+#   displayName: Update Virtual Machine Scale Set (${{ parameters.image_type }})
+#   timeoutInMinutes: 600
+#   cancelTimeoutInMinutes: 30
+#   pool: 
+#     name: ${{ parameters.agent_pool }}
+#   dependsOn: managedimagegeneration
+#   variables:
+#   - name: ManagedImageId
+#     value: $[ dependencies.managedimagegeneration.outputs['createmanagedimage.ManagedImageId'] ]
+#   - ${{ if eq(parameters.image_type, 'windows2019') }}:
+#     - name: VmssName
+#       value: $[variables.VMSS_Windows2019]
+#   - ${{ if eq(parameters.image_type, 'ubuntu2004') }}:
+#     - name: VmssName
+#       value: $[variables.VMSS_Ubuntu2004]
 
-  steps:
-  - task: PowerShell@2
-    displayName: 'Update Virtual Machine Scale Set'
-    inputs:
-      targetType: filePath
-      filePath: ./scripts/update-vmss.ps1
-      arguments: -ClientId $(CLIENT_ID) `
-                        -ClientSecret $(CLIENT_SECRET) `
-                        -ResourceGroup $(AZURE_AGENTS_RESOURCE_GROUP) `
-                        -SubscriptionId $(AZURE_SUBSCRIPTION) `
-                        -TenantId $(AZURE_TENANT) `
-                        -VmssName $(VmssName) `
-                        -ManagedImageId $(ManagedImageId)
+#   steps:
+#   - task: PowerShell@2
+#     displayName: 'Update Virtual Machine Scale Set'
+#     inputs:
+#       targetType: filePath
+#       filePath: ./scripts/update-vmss.ps1
+#       arguments: -ClientId $(CLIENT_ID) `
+#                         -ClientSecret $(CLIENT_SECRET) `
+#                         -ResourceGroup $(AZURE_AGENTS_RESOURCE_GROUP) `
+#                         -SubscriptionId $(AZURE_SUBSCRIPTION) `
+#                         -TenantId $(AZURE_TENANT) `
+#                         -VmssName $(VmssName) `
+#                         -ManagedImageId $(ManagedImageId)
