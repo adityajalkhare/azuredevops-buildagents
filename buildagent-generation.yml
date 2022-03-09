@@ -95,6 +95,7 @@ jobs:
   - task: PowerShell@2
     displayName: 'Clean up resources'
     condition: always()
+    continueOnError: true
     inputs:
       targetType: filePath
       filePath: ./scripts/cleanup.ps1
